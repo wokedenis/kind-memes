@@ -1,11 +1,11 @@
-import fs from 'fs/promises'
+import fs from 'fs'
 import path from 'path'
 import { XMLParser, XMLBuilder } from 'fast-xml-parser'
 
 export async function getAvailableImages(): Promise<string> {
   try {
     const xmlPath = path.join(process.cwd(), 'components', 'ui', 'AVAILABLE_IMAGES.xml')
-    const xmlContent = await fs.readFile(xmlPath, 'utf-8')
+    const xmlContent = await fs.readFileSync(xmlPath, 'utf-8')
 
     const parser = new XMLParser({ ignoreAttributes: false, attributeNamePrefix: "" })
     const jsonObj = parser.parse(xmlContent)
