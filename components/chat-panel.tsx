@@ -36,24 +36,24 @@ export function ChatPanel({
 
   const exampleMessages = [
     {
-      heading: 'Can you help me?',
-      subheading: 'I want to tell you my story.',
-      message: `Can you help me? I want to tell you my story.`
+      heading: 'I\'m feeling anxious',
+      subheading: 'Can you help me understand why?',
+      message: 'I\'ve been feeling very anxious lately. Can you help me understand why and what I can do about it?'
     },
     {
-      heading: 'Hi, I want to',
-      subheading: 'share something with you.',
-      message: 'Hi, I want to share something with you.'
+      heading: 'I had a difficult childhood',
+      subheading: 'How might it affect me now?',
+      message: 'I had a difficult childhood. How might those experiences be affecting me in my adult life?'
     },
     {
-      heading: 'Can you help me?',
-      subheading: 'I want to tell you my story.',
-      message: `Can you help me? I want to tell you my story.`
+      heading: 'I\'m having relationship issues',
+      subheading: 'Can you offer some advice?',
+      message: 'I\'m having some issues in my relationship. Can you offer some advice on how to communicate better?'
     },
     {
-      heading: 'Hi, I want to',
-      subheading: 'share something with you.',
-      message: 'Hi, I want to share something with you.'
+      heading: 'I\'m feeling overwhelmed',
+      subheading: 'How can I manage stress better?',
+      message: 'I\'m feeling overwhelmed with work and life. How can I manage my stress better and find balance?'
     }
   ]
 
