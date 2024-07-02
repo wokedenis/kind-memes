@@ -51,30 +51,30 @@ async function submitUserMessage(content: string) {
         name: message.name
       }))
     ],
-    text: async ({ content, done, delta }) => {
-      if (!textStream) {
-        textStream = createStreamableValue<string>('')
-        textNode = <BotMessage content={textStream.value} />
-      }
+    // text: async ({ content, done, delta }) => {
+    //   if (!textStream) {
+    //     textStream = createStreamableValue<string>('')
+    //     textNode = <BotMessage content={textStream.value} />
+    //   }
 
-      if (done) {
-        textStream.done()
-        aiState.done({
-          ...aiState.get(),
-          messages: [
-            ...aiState.get().messages,
-            {
-              id: nanoid(),
-              role: 'assistant',
-              content
-            }
-          ]
-        })
-      } else {
-        textStream.update(delta)
-      }
-      return textNode
-    },
+    //   if (done) {
+    //     textStream.done()
+    //     aiState.done({
+    //       ...aiState.get(),
+    //       messages: [
+    //         ...aiState.get().messages,
+    //         {
+    //           id: nanoid(),
+    //           role: 'assistant',
+    //           content
+    //         }
+    //       ]
+    //     })
+    //   } else {
+    //     textStream.update(delta)
+    //   }
+    //   return textNode
+    // },
     tools: {
       generateMeme: {
         description: 'Generate a meme with top and bottom text',
