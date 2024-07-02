@@ -18,8 +18,8 @@ export function MemeCanvas({
   bottomText, 
   imageUrl, 
   onRetry = () => {}, 
-  onTopTextChange = () => {}, 
-  onBottomTextChange = () => {} 
+  onTopTextChange = (text: string) => {}, 
+  onBottomTextChange = (text: string) => {} 
 }: MemeCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [memeImage, setMemeImage] = useState<HTMLImageElement | null>(null)
