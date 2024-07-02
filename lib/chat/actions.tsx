@@ -49,7 +49,6 @@ import { saveChat } from '@/app/actions'
 import { BotMessage, SpinnerMessage, UserMessage } from '@/components/ui/message'
 import { Chat, Message } from '@/lib/types'
 import { auth } from '@/auth'
-// import { MemeCanvas } from '@/components/ui/meme-canvas'
 
 async function submitUserMessage(content: string) {
   'use server'
