@@ -26,9 +26,14 @@ function getAvailableImages(): string {
 
   const shuffledImages = images.sort(() => Math.random() - 0.5);
   
-  const xmlString = `<images>${shuffledImages.map(img => `<image>${img}</image>`).join('')}</images>`;
+  const xmlBuilder = new XMLBuilder({ format: true });
+  const xmlObj = {
+    images: {
+      image: shuffledImages
+    }
+  };
   
-  return xmlString;
+  return xmlBuilder.build(xmlObj);
 }
 import { anthropic } from '@ai-sdk/anthropic';
 import { generateText } from 'ai';
