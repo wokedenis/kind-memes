@@ -10,7 +10,7 @@ import { ChatShareDialog } from '@/components/chat-share-dialog'
 import { useAIState, useActions, useUIState } from 'ai/rsc'
 import type { AI } from '@/lib/chat/actions'
 import { nanoid } from 'nanoid'
-import { UserMessage } from './stocks/message'
+import { UserMessage } from './ui/message'
 
 export interface ChatPanelProps {
   id?: string
@@ -36,24 +36,24 @@ export function ChatPanel({
 
   const exampleMessages = [
     {
-      heading: 'What are the',
-      subheading: 'trending memecoins today?',
-      message: `What are the trending memecoins today?`
+      heading: 'Can you help me?',
+      subheading: 'I want to tell you my story.',
+      message: `Can you help me? I want to tell you my story.`
     },
     {
-      heading: 'What is the price of',
-      subheading: '$DOGE right now?',
-      message: 'What is the price of $DOGE right now?'
+      heading: 'Hi, I want to',
+      subheading: 'share something with you.',
+      message: 'Hi, I want to share something with you.'
     },
     {
-      heading: 'I would like to buy',
-      subheading: '42 $DOGE',
-      message: `I would like to buy 42 $DOGE`
+      heading: 'Can you help me?',
+      subheading: 'I want to tell you my story.',
+      message: `Can you help me? I want to tell you my story.`
     },
     {
-      heading: 'What are some',
-      subheading: `recent events about $DOGE?`,
-      message: `What are some recent events about $DOGE?`
+      heading: 'Hi, I want to',
+      subheading: 'share something with you.',
+      message: 'Hi, I want to share something with you.'
     }
   ]
 

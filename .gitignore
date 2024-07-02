@@ -40,3 +40,5 @@ yarn-error.log*
 # personal
 .internal/
 .deniska_code/
+.aider*
+venv/
