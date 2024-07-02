@@ -2,7 +2,7 @@
 
 import React, { useRef, useEffect, useState } from 'react'
 import { Button } from './button'
-import { Settings, RefreshCw } from 'lucide-react'
+import { Settings, RefreshCw, Copy, Save } from 'lucide-react'
 
 interface MemeCanvasProps {
   topText: string
@@ -138,12 +138,18 @@ export function MemeCanvas({ topText, bottomText, imageUrl, onRetry, onTopTextCh
     <div className="flex flex-col items-center bg-white rounded-lg shadow-md p-6 max-w-2xl w-full mx-auto">
       <canvas ref={canvasRef} className="max-w-full h-auto mb-4 rounded" />
       <div className="flex space-x-2 w-full mb-4">
-        <Button onClick={handleCopyMeme} className="flex-1 bg-green-500 hover:bg-green-600">Copy Meme</Button>
-        <Button onClick={handleSaveMeme} className="flex-1 bg-green-500 hover:bg-green-600">Save Meme</Button>
-        <Button onClick={() => setShowSettings(!showSettings)} className="p-2 bg-gray-200 hover:bg-gray-300">
+        <Button onClick={handleCopyMeme} className="flex-1 bg-green-500 hover:bg-green-600">
+          <span className="hidden sm:inline">Copy Meme</span>
+          <Copy className="inline sm:hidden" size={24} />
+        </Button>
+        <Button onClick={handleSaveMeme} className="flex-1 bg-green-500 hover:bg-green-600">
+          <span className="hidden sm:inline">Save Meme</span>
+          <Save className="inline sm:hidden" size={24} />
+        </Button>
+        <Button onClick={() => setShowSettings(!showSettings)} className="p-2 bg-gray-400 hover:bg-gray-500">
           <Settings size={24} />
         </Button>
-        <Button onClick={onRetry} className="p-2 bg-gray-200 hover:bg-gray-300">
+        <Button onClick={onRetry} className="p-2 bg-gray-400 hover:bg-gray-500">
           <RefreshCw size={24} />
         </Button>
       </div>
