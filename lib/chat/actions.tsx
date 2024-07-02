@@ -15,7 +15,10 @@ async function getAvailableImages(): Promise<string> {
     const xmlPath = path.join(process.cwd(), 'components', 'ui', 'AVAILABLE_IMAGES.xml')
     const xmlContent = await fs.readFile(xmlPath, 'utf-8')
     
-    const parser = new XMLParser()
+    const parser = new XMLParser({
+      ignoreAttributes: false,
+      attributeNamePrefix: "@_"
+    })
     const jsonObj = parser.parse(xmlContent)
     
     let images = jsonObj.images?.image || []
@@ -27,13 +30,18 @@ async function getAvailableImages(): Promise<string> {
     
     const shuffledImages = images.sort(() => Math.random() - 0.5)
     
-    const builder = new XMLBuilder({ format: true })
-    console.log(builder.build({ images: { image: shuffledImages } }))
-    return builder.build({ images: { image: shuffledImages } })
+    const builder = new XMLBuilder({
+      format: true,
+      ignoreAttributes: false,
+      attributeNamePrefix: "@_"
+    })
+    const result = builder.build({ images: { image: shuffledImages } })
+    console.log(result)
+    return result
   } catch (error) {
     console.error('Error in getAvailableImages:', error)
     // Return a default XML string with an error message
-    return '<images><image>Error: Unable to load images</image></images>'
+    return '<images><image name="error">Error: Unable to load images</image></images>'
   }
 }
 import { anthropic } from '@ai-sdk/anthropic';
