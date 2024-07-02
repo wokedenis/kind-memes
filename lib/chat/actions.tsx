@@ -8,12 +8,14 @@ import {
   createStreamableValue
 } from 'ai/rsc'
 import { anthropic } from '@ai-sdk/anthropic';
+import { z } from 'zod';
 
 import { nanoid } from '@/lib/utils'
 import { saveChat } from '@/app/actions'
 import { BotMessage, SpinnerMessage, UserMessage } from '@/components/ui/message'
 import { Chat, Message } from '@/lib/types'
 import { auth } from '@/auth'
+import { MemeCanvas } from '@/components/ui/meme-canvas'
 
 const UNSPLASH_API_KEY = process.env.UNSPLASH_API_KEY
 
@@ -41,7 +43,7 @@ async function submitUserMessage(content: string) {
     model: anthropic('claude-3-haiku-20240307'),
     initial: <SpinnerMessage />,
     system: `\
-    You are a helpful AI assistant. You can chat with users and answer their questions. You can also generate memes when asked. To generate a meme, respond with JSON in the format: {"type": "meme", "topText": "...", "bottomText": "...", "imagePrompt": "..."}`,
+    You are a helpful AI assistant. You can chat with users and answer their questions. You can also generate memes when asked. To generate a meme, use the generateMeme tool.`,
     messages: [
       ...aiState.get().messages.map((message: any) => ({
         role: message.role,
@@ -57,26 +59,6 @@ async function submitUserMessage(content: string) {
 
       if (done) {
         textStream.done()
-        try {
-          const memeData = JSON.parse(content)
-          if (memeData.type === 'meme') {
-            const imageUrl = await generateMeme(memeData.imagePrompt)
-            if (imageUrl) {
-              textNode = (
-                <BotMessage
-                  content={`Here's your meme:`}
-                  memeData={{
-                    topText: memeData.topText,
-                    bottomText: memeData.bottomText,
-                    imageUrl
-                  }}
-                />
-              )
-            }
-          }
-        } catch (error) {
-          // Not a valid JSON, treat as normal text
-        }
         aiState.done({
           ...aiState.get(),
           messages: [
@@ -94,7 +76,28 @@ async function submitUserMessage(content: string) {
       return textNode
     },
     tools: {
-      // Remove all stock-related tools
+      generateMeme: {
+        description: 'Generate a meme with top and bottom text',
+        parameters: z.object({
+          topText: z.string(),
+          bottomText: z.string(),
+          imagePrompt: z.string()
+        }),
+        generate: async function* ({ topText, bottomText, imagePrompt }) {
+          yield <SpinnerMessage />
+          const imageUrl = await generateMeme(imagePrompt)
+          return (
+            <BotMessage
+              content={`Here's your meme:`}
+              memeData={{
+                topText,
+                bottomText,
+                imageUrl
+              }}
+            />
+          )
+        }
+      }
     }
   })
 
@@ -180,6 +183,7 @@ export const getUIStateFromAIState = (aiState: Chat) => {
         ) : null
     }))
 }
+
 async function generateMeme(prompt: string) {
   // Using a placeholder image instead of Unsplash API
   return 'https://i.pinimg.com/originals/b2/2c/36/b22c366f0e8410df0a693ff9d26f1e3e.jpg'
