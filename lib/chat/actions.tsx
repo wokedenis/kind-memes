@@ -10,32 +10,25 @@ import {
   streamUI,
 } from 'ai/rsc'
 
-async function getAvailableImages(): Promise<string> {
-  try {
-    const xmlPath = path.join(process.cwd(), 'components', 'ui', 'AVAILABLE_IMAGES.xml')
-    const xmlContent = await fs.readFile(xmlPath, 'utf-8')
-    
-    const parser = new XMLParser()
-    const jsonObj = parser.parse(xmlContent)
-    
-    let images = jsonObj.images?.image || []
-    
-    // Ensure images is always an array
-    if (!Array.isArray(images)) {
-      images = [images]
-    }
-    
-    const shuffledImages = images.sort(() => Math.random() - 0.5)
-    
-    const builder = new XMLBuilder({ format: true })
-    console.log(builder.build({ images: { image: shuffledImages } }))
-    return builder.build({ images: { image: shuffledImages } })
-  } catch (error) {
-    console.error('Error in getAvailableImages:', error)
-    // Return a default XML string with an error message
-    const result = '<images><image>Error: Unable to load images</image></images>'
-    return result
-  }
+function getAvailableImages(): string {
+  const images = [
+    'happy_dog.jpg',
+    'sunset_beach.jpg',
+    'mountain_view.jpg',
+    'cute_cat.jpg',
+    'colorful_flowers.jpg',
+    'peaceful_lake.jpg',
+    'autumn_leaves.jpg',
+    'starry_night.jpg',
+    'cozy_fireplace.jpg',
+    'spring_blossom.jpg'
+  ];
+
+  const shuffledImages = images.sort(() => Math.random() - 0.5);
+  
+  const xmlString = `<images>${shuffledImages.map(img => `<image>${img}</image>`).join('')}</images>`;
+  
+  return xmlString;
 }
 import { anthropic } from '@ai-sdk/anthropic';
 import { generateText } from 'ai';
