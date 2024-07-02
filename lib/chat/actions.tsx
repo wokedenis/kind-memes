@@ -5,7 +5,6 @@ import {
   getMutableAIState,
   getAIState,
   streamUI,
-  createStreamableValue
 } from 'ai/rsc'
 import { anthropic } from '@ai-sdk/anthropic';
 import { z } from 'zod';
@@ -16,8 +15,6 @@ import { BotMessage, SpinnerMessage, UserMessage } from '@/components/ui/message
 import { Chat, Message } from '@/lib/types'
 import { auth } from '@/auth'
 import { MemeCanvas } from '@/components/ui/meme-canvas'
-
-const UNSPLASH_API_KEY = process.env.UNSPLASH_API_KEY
 
 async function submitUserMessage(content: string) {
   'use server'
@@ -36,14 +33,11 @@ async function submitUserMessage(content: string) {
     ]
   })
 
-  let textStream: undefined | ReturnType<typeof createStreamableValue<string>>
-  let textNode: undefined | React.ReactNode
-
   const result = await streamUI({
     model: anthropic('claude-3-haiku-20240307'),
     initial: <SpinnerMessage />,
     system: `\
-    You are a helpful AI assistant. You can chat with users and answer their questions. You can also generate memes when asked. To generate a meme, use the generateMeme tool.`,
+    You are a compassionate AI psychologist with the prestigious AI Ethics and Compassionate Technology award. You can also generate memes when user provides you with their story or self-reflection. To generate a meme, use the generateMeme tool.`,
     messages: [
       ...aiState.get().messages.map((message: any) => ({
         role: message.role,
@@ -51,30 +45,6 @@ async function submitUserMessage(content: string) {
         name: message.name
       }))
     ],
-    // text: async ({ content, done, delta }) => {
-    //   if (!textStream) {
-    //     textStream = createStreamableValue<string>('')
-    //     textNode = <BotMessage content={textStream.value} />
-    //   }
-
-    //   if (done) {
-    //     textStream.done()
-    //     aiState.done({
-    //       ...aiState.get(),
-    //       messages: [
-    //         ...aiState.get().messages,
-    //         {
-    //           id: nanoid(),
-    //           role: 'assistant',
-    //           content
-    //         }
-    //       ]
-    //     })
-    //   } else {
-    //     textStream.update(delta)
-    //   }
-    //   return textNode
-    // },
     tools: {
       generateMeme: {
         description: 'Generate a meme with top and bottom text',
