@@ -28,6 +28,7 @@ async function getAvailableImages(): Promise<string> {
     const shuffledImages = images.sort(() => Math.random() - 0.5)
     
     const builder = new XMLBuilder({ format: true })
+    console.log(builder.build({ images: { image: shuffledImages } }))
     return builder.build({ images: { image: shuffledImages } })
   } catch (error) {
     console.error('Error in getAvailableImages:', error)
@@ -65,7 +66,7 @@ async function submitUserMessage(content: string) {
 
   const result = await streamUI({
     model: anthropic('claude-3-haiku-20240307'),
-    initial: () => <SpinnerMessage />,
+    initial: <SpinnerMessage />,
     system: `\
     You are a compassionate AI psychologist with the prestigious AI Ethics and Compassionate Technology award. You can also generate memes when user provides you with their story or self-reflection. To generate a meme, use the generateMeme tool.`,
     messages: [
@@ -82,7 +83,7 @@ async function submitUserMessage(content: string) {
           userStory: z.string()
         }),
         generate: async function* ({ userStory }) {
-          yield { display: <SpinnerMessage /> }
+          yield <SpinnerMessage />
           
           const availableImages = await getAvailableImages();
           const prompt = `You are tasked with creating an uplifting meme based on a user's personal story. Your goal is to analyze the story, identify any negative thought patterns, and create a meme that gently challenges these beliefs while offering a positive perspective.
@@ -170,18 +171,16 @@ Remember to be compassionate, empathetic, and constructive in your analysis and 
 
           const imageUrl = `/images/memes/${selectedImage}`;
 
-          return {
-            display: (
-              <BotMessage
-                content={chatReply}
-                memeData={{
-                  topText,
-                  bottomText,
-                  imageUrl
-                }}
-              />
-            )
-          }
+          return (
+            <BotMessage
+              content={chatReply}
+              memeData={{
+                topText,
+                bottomText,
+                imageUrl
+              }}
+            />
+          )
         }
       }
     }
@@ -262,13 +261,10 @@ export const getUIStateFromAIState = (aiState: Chat) => {
       id: `${aiState.chatId}-${index}`,
       display:
         message.role === 'user' ? (
-          <UserMessage key={message.id}>{message.content as string}</UserMessage>
-        ) : message.role === 'assistant' ? (
+          <UserMessage>{message.content as string}</UserMessage>
+        ) : message.role === 'assistant' &&
           typeof message.content === 'string' ? (
-            <BotMessage key={message.id} content={message.content} />
-          ) : (
-            message.content
-          )
+          <BotMessage content={message.content} />
         ) : null
     }))
 }
