@@ -24,6 +24,7 @@ async function getAvailableImages(): Promise<string> {
   return builder.build({ images: { image: shuffledImages } })
 }
 import { anthropic } from '@ai-sdk/anthropic';
+import { generateText } from 'ai';
 import { z } from 'zod';
 
 import { nanoid } from '@/lib/utils'
@@ -52,7 +53,7 @@ async function submitUserMessage(content: string) {
 
   const result = await streamUI({
     model: anthropic('claude-3-haiku-20240307'),
-    initial: () => <SpinnerMessage />,
+    initial: <SpinnerMessage />,
     system: `\
     You are a compassionate AI psychologist with the prestigious AI Ethics and Compassionate Technology award. You can also generate memes when user provides you with their story or self-reflection. To generate a meme, use the generateMeme tool.`,
     messages: [
@@ -69,7 +70,7 @@ async function submitUserMessage(content: string) {
           userStory: z.string()
         }),
         generate: async function* ({ userStory }) {
-          yield () => <SpinnerMessage />
+          yield <SpinnerMessage />
           
           const availableImages = await getAvailableImages();
           const prompt = `You are tasked with creating an uplifting meme based on a user's personal story. Your goal is to analyze the story, identify any negative thought patterns, and create a meme that gently challenges these beliefs while offering a positive perspective.
@@ -145,21 +146,19 @@ Provide your output in the following format:
 
 Remember to be compassionate, empathetic, and constructive in your analysis and meme creation. Your goal is to uplift and encourage the user while gently challenging any unhelpful thought patterns.`;
 
-          const response = await anthropic('claude-3-haiku-20240307').complete({
+          const { text: response } = await generateText({
+            model: anthropic('claude-3-haiku-20240307'),
             prompt,
-            max_tokens_to_sample: 1000,
           });
 
-          const result = response.completion;
-
-          const topText = result.match(/<top_text>([\s\S]*?)<\/top_text>/)?.[1].trim() || '';
-          const bottomText = result.match(/<bottom_text>([\s\S]*?)<\/bottom_text>/)?.[1].trim() || '';
-          const selectedImage = result.match(/<selected_image>([\s\S]*?)<\/selected_image>/)?.[1].trim() || '';
-          const chatReply = result.match(/<chat_reply>([\s\S]*?)<\/chat_reply>/)?.[1].trim() || '';
+          const topText = response.match(/<top_text>([\s\S]*?)<\/top_text>/)?.[1]?.trim() || '';
+          const bottomText = response.match(/<bottom_text>([\s\S]*?)<\/bottom_text>/)?.[1]?.trim() || '';
+          const selectedImage = response.match(/<selected_image>([\s\S]*?)<\/selected_image>/)?.[1]?.trim() || '';
+          const chatReply = response.match(/<chat_reply>([\s\S]*?)<\/chat_reply>/)?.[1].trim() || '';
 
           const imageUrl = `/images/memes/${selectedImage}`;
 
-          return () => (
+          return (
             <BotMessage
               content={chatReply}
               memeData={{
@@ -248,10 +247,10 @@ export const getUIStateFromAIState = (aiState: Chat) => {
     .map((message, index) => ({
       id: `${aiState.chatId}-${index}`,
       display:
-        message.role === 'user' ? () => (
+        message.role === 'user' ? (
           <UserMessage>{message.content as string}</UserMessage>
         ) : message.role === 'assistant' &&
-          typeof message.content === 'string' ? () => (
+          typeof message.content === 'string' ? (
           <BotMessage content={message.content} />
         ) : null
     }))
