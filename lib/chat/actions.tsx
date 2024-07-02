@@ -40,6 +40,7 @@ async function getAvailableImages(): Promise<string> {
     return '<images><image>Error: Unable to load images</image></images>'
   }
 }
+
 import { anthropic } from '@ai-sdk/anthropic';
 import { generateText } from 'ai';
 import { z } from 'zod';
