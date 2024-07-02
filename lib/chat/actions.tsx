@@ -13,15 +13,16 @@ import {
 async function getAvailableImages(): Promise<string> {
   try {
     const xmlPath = path.join(process.cwd(), 'components', 'ui', 'AVAILABLE_IMAGES.xml')
-    const xmlContent = await fs.readFile(xmlPath, 'utf-8')
-    
-    const parser = new XMLParser({
-      ignoreAttributes: false,
-      attributeNamePrefix: "@_"
-    })
+
+       const xmlContent = await fs.readFile(xmlPath, 'utf-8')
+
+    const parser = new XMLParser({ ignoreAttributes: false, attributeNamePrefix: "" })
     const jsonObj = parser.parse(xmlContent)
     
-    let images = jsonObj.images?.image || []
+    let images = jsonObj.image || []
+    if (!Array.isArray(images)) {
+      images = [images].filter(Boolean)
+    }
     
     // Ensure images is always an array
     if (!Array.isArray(images)) {
@@ -30,18 +31,13 @@ async function getAvailableImages(): Promise<string> {
     
     const shuffledImages = images.sort(() => Math.random() - 0.5)
     
-    const builder = new XMLBuilder({
-      format: true,
-      ignoreAttributes: false,
-      attributeNamePrefix: "@_"
-    })
+    const builder = new XMLBuilder({ format: true })
     const result = builder.build({ images: { image: shuffledImages } })
-    console.log(result)
     return result
   } catch (error) {
     console.error('Error in getAvailableImages:', error)
     // Return a default XML string with an error message
-    return '<images><image name="error">Error: Unable to load images</image></images>'
+    return '<images><image>Error: Unable to load images</image></images>'
   }
 }
 import { anthropic } from '@ai-sdk/anthropic';
@@ -177,7 +173,7 @@ Remember to be compassionate, empathetic, and constructive in your analysis and 
           const selectedImage = response.match(/<selected_image>([\s\S]*?)<\/selected_image>/)?.[1]?.trim() || '';
           const chatReply = response.match(/<chat_reply>([\s\S]*?)<\/chat_reply>/)?.[1].trim() || '';
 
-          const imageUrl = `/images/memes/${selectedImage}`;
+          const imageUrl = `/images/memes/${selectedImage}.jpg`;
 
           return (
             <BotMessage
