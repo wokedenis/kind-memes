@@ -15,6 +15,8 @@ import { BotMessage, SpinnerMessage, UserMessage } from '@/components/ui/message
 import { Chat, Message } from '@/lib/types'
 import { auth } from '@/auth'
 
+const UNSPLASH_API_KEY = process.env.UNSPLASH_API_KEY
+
 async function submitUserMessage(content: string) {
   'use server'
 
@@ -39,7 +41,7 @@ async function submitUserMessage(content: string) {
     model: anthropic('claude-3-haiku-20240307'),
     initial: <SpinnerMessage />,
     system: `\
-    You are a helpful AI assistant. You can chat with users and answer their questions.`,
+    You are a helpful AI assistant. You can chat with users and answer their questions. You can also generate memes when asked. To generate a meme, respond with JSON in the format: {"type": "meme", "topText": "...", "bottomText": "...", "imagePrompt": "..."}`,
     messages: [
       ...aiState.get().messages.map((message: any) => ({
         role: message.role,
@@ -47,7 +49,7 @@ async function submitUserMessage(content: string) {
         name: message.name
       }))
     ],
-    text: ({ content, done, delta }) => {
+    text: async ({ content, done, delta }) => {
       if (!textStream) {
         textStream = createStreamableValue('')
         textNode = <BotMessage content={textStream.value} />
@@ -55,6 +57,26 @@ async function submitUserMessage(content: string) {
 
       if (done) {
         textStream.done()
+        try {
+          const memeData = JSON.parse(content)
+          if (memeData.type === 'meme') {
+            const imageUrl = await generateMeme(memeData.imagePrompt)
+            if (imageUrl) {
+              textNode = (
+                <BotMessage
+                  content={`Here's your meme:`}
+                  memeData={{
+                    topText: memeData.topText,
+                    bottomText: memeData.bottomText,
+                    imageUrl
+                  }}
+                />
+              )
+            }
+          }
+        } catch (error) {
+          // Not a valid JSON, treat as normal text
+        }
         aiState.done({
           ...aiState.get(),
           messages: [
@@ -157,4 +179,14 @@ export const getUIStateFromAIState = (aiState: Chat) => {
           <BotMessage content={message.content} />
         ) : null
     }))
+}
+async function generateMeme(prompt: string) {
+  try {
+    const response = await fetch(`https://api.unsplash.com/photos/random?query=${encodeURIComponent(prompt)}&client_id=${UNSPLASH_API_KEY}`)
+    const data = await response.json()
+    return data.urls.regular
+  } catch (error) {
+    console.error('Error fetching image:', error)
+    return null
+  }
 }

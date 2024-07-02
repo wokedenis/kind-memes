@@ -9,6 +9,7 @@ import remarkGfm from 'remark-gfm'
 import remarkMath from 'remark-math'
 import { StreamableValue, useStreamableValue } from 'ai/rsc'
 import { useStreamableText } from '@/lib/hooks/use-streamable-text'
+import { MemeCanvas } from './meme-canvas'
 
 // Different types of message bubbles.
 
@@ -27,10 +28,12 @@ export function UserMessage({ children }: { children: React.ReactNode }) {
 
 export function BotMessage({
   content,
-  className
+  className,
+  memeData
 }: {
   content: string | StreamableValue<string>
   className?: string
+  memeData?: { topText: string; bottomText: string; imageUrl: string }
 }) {
   const text = useStreamableText(content)
 
@@ -81,6 +84,13 @@ export function BotMessage({
         >
           {text}
         </MemoizedReactMarkdown>
+        {memeData && (
+          <MemeCanvas
+            topText={memeData.topText}
+            bottomText={memeData.bottomText}
+            imageUrl={memeData.imageUrl}
+          />
+        )}
       </div>
     </div>
   )
