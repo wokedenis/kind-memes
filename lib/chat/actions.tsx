@@ -185,6 +185,6 @@ export const getUIStateFromAIState = (aiState: Chat) => {
 }
 
 async function generateMeme(prompt: string) {
-  // Using a placeholder image instead of Unsplash API
-  return 'https://i.pinimg.com/originals/b2/2c/36/b22c366f0e8410df0a693ff9d26f1e3e.jpg'
+  // For now, we'll use a static image. In the future, this could be expanded to select from multiple images or use an API.
+  return '/images/memes/placeholder.jpg'
 }
