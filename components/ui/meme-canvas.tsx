@@ -9,9 +9,11 @@ interface MemeCanvasProps {
   bottomText: string
   imageUrl: string
   onRetry: () => void
+  onTopTextChange: (text: string) => void
+  onBottomTextChange: (text: string) => void
 }
 
-export function MemeCanvas({ topText, bottomText, imageUrl, onRetry }: MemeCanvasProps) {
+export function MemeCanvas({ topText, bottomText, imageUrl, onRetry, onTopTextChange, onBottomTextChange }: MemeCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [memeImage, setMemeImage] = useState<HTMLImageElement | null>(null)
   const [topTextSize, setTopTextSize] = useState<number>(1)
@@ -148,6 +150,18 @@ export function MemeCanvas({ topText, bottomText, imageUrl, onRetry }: MemeCanva
       {showSettings && (
         <div className="w-full p-4 bg-gray-100 rounded-lg">
           <div className="mb-4">
+            <label htmlFor="top-text-edit" className="block text-sm font-medium text-gray-700 mb-1">
+              Top text
+            </label>
+            <textarea
+              id="top-text-edit"
+              value={topText}
+              onChange={(e) => onTopTextChange(e.target.value)}
+              className="w-full p-2 border rounded"
+              rows={2}
+            />
+          </div>
+          <div className="mb-4">
             <label htmlFor="top-text-size" className="block text-sm font-medium text-gray-700 mb-1">
               Top text size: {topTextSize.toFixed(1)}
             </label>
@@ -160,6 +174,18 @@ export function MemeCanvas({ topText, bottomText, imageUrl, onRetry }: MemeCanva
               value={topTextSize}
               onChange={(e) => setTopTextSize(parseFloat(e.target.value))}
               className="w-full"
+            />
+          </div>
+          <div className="mb-4">
+            <label htmlFor="bottom-text-edit" className="block text-sm font-medium text-gray-700 mb-1">
+              Bottom text
+            </label>
+            <textarea
+              id="bottom-text-edit"
+              value={bottomText}
+              onChange={(e) => onBottomTextChange(e.target.value)}
+              className="w-full p-2 border rounded"
+              rows={2}
             />
           </div>
           <div className="mb-4">
