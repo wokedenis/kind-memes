@@ -11,17 +11,31 @@ import {
 } from 'ai/rsc'
 
 async function getAvailableImages(): Promise<string> {
-  const xmlPath = path.join(process.cwd(), 'public', 'AVAILABLE_IMAGES.xml')
-  const xmlContent = await fs.readFile(xmlPath, 'utf-8')
-  
-  const parser = new XMLParser()
-  const jsonObj = parser.parse(xmlContent)
-  
-  const images = jsonObj.images.image
-  const shuffledImages = images.sort(() => Math.random() - 0.5)
-  
-  const builder = new XMLBuilder({ format: true })
-  return builder.build({ images: { image: shuffledImages } })
+  try {
+    const xmlPath = path.join(process.cwd(), 'components', 'ui', 'AVAILABLE_IMAGES.xml')
+    const xmlContent = await fs.readFile(xmlPath, 'utf-8')
+    
+    const parser = new XMLParser()
+    const jsonObj = parser.parse(xmlContent)
+    
+    let images = jsonObj.images?.image || []
+    
+    // Ensure images is always an array
+    if (!Array.isArray(images)) {
+      images = [images]
+    }
+    
+    const shuffledImages = images.sort(() => Math.random() - 0.5)
+    
+    const builder = new XMLBuilder({ format: true })
+    console.log(builder.build({ images: { image: shuffledImages } }))
+    return builder.build({ images: { image: shuffledImages } })
+  } catch (error) {
+    console.error('Error in getAvailableImages:', error)
+    // Return a default XML string with an error message
+    const result = '<images><image>Error: Unable to load images</image></images>'
+    return result
+  }
 }
 import { anthropic } from '@ai-sdk/anthropic';
 import { generateText } from 'ai';
@@ -32,7 +46,7 @@ import { saveChat } from '@/app/actions'
 import { BotMessage, SpinnerMessage, UserMessage } from '@/components/ui/message'
 import { Chat, Message } from '@/lib/types'
 import { auth } from '@/auth'
-import { MemeCanvas } from '@/components/ui/meme-canvas'
+// import { MemeCanvas } from '@/components/ui/meme-canvas'
 
 async function submitUserMessage(content: string) {
   'use server'
