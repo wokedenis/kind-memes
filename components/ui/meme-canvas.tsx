@@ -15,13 +15,14 @@ export function MemeCanvas({ topText, bottomText, imageUrl }: MemeCanvasProps) {
 
   useEffect(() => {
     const img = new Image()
+    const corsProxyUrl = 'https://cors-anywhere.herokuapp.com/'
     img.crossOrigin = 'anonymous'
     img.onload = () => setMemeImage(img)
     img.onerror = (e) => {
       console.error('Error loading image:', e)
       alert('Failed to load the image. Please try a different URL.')
     }
-    img.src = imageUrl
+    img.src = `${corsProxyUrl}${imageUrl}`
   }, [imageUrl])
 
   useEffect(() => {
