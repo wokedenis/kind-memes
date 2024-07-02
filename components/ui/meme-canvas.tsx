@@ -8,12 +8,19 @@ interface MemeCanvasProps {
   topText: string
   bottomText: string
   imageUrl: string
-  onRetry: () => void
-  onTopTextChange: (text: string) => void
-  onBottomTextChange: (text: string) => void
+  onRetry?: () => void
+  onTopTextChange?: (text: string) => void
+  onBottomTextChange?: (text: string) => void
 }
 
-export function MemeCanvas({ topText, bottomText, imageUrl, onRetry, onTopTextChange, onBottomTextChange }: MemeCanvasProps) {
+export function MemeCanvas({ 
+  topText, 
+  bottomText, 
+  imageUrl, 
+  onRetry = () => {}, 
+  onTopTextChange = () => {}, 
+  onBottomTextChange = () => {} 
+}: MemeCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [memeImage, setMemeImage] = useState<HTMLImageElement | null>(null)
   const [topTextSize, setTopTextSize] = useState<number>(1)
