@@ -1,4 +1,7 @@
 import 'server-only'
+import fs from 'fs/promises'
+import path from 'path'
+import { XMLParser, XMLBuilder } from 'fast-xml-parser'
 
 import {
   createAI,
@@ -6,6 +9,20 @@ import {
   getAIState,
   streamUI,
 } from 'ai/rsc'
+
+async function getAvailableImages(): Promise<string> {
+  const xmlPath = path.join(process.cwd(), 'public', 'AVAILABLE_IMAGES.xml')
+  const xmlContent = await fs.readFile(xmlPath, 'utf-8')
+  
+  const parser = new XMLParser()
+  const jsonObj = parser.parse(xmlContent)
+  
+  const images = jsonObj.images.image
+  const shuffledImages = images.sort(() => Math.random() - 0.5)
+  
+  const builder = new XMLBuilder({ format: true })
+  return builder.build({ images: { image: shuffledImages } })
+}
 import { anthropic } from '@ai-sdk/anthropic';
 import { z } from 'zod';
 
@@ -47,18 +64,104 @@ async function submitUserMessage(content: string) {
     ],
     tools: {
       generateMeme: {
-        description: 'Generate a meme with top and bottom text',
+        description: 'Generate a meme based on the user\'s story',
         parameters: z.object({
-          topText: z.string(),
-          bottomText: z.string(),
-          imagePrompt: z.string()
+          userStory: z.string()
         }),
-        generate: async function* ({ topText, bottomText, imagePrompt }) {
+        generate: async function* ({ userStory }) {
           yield <SpinnerMessage />
-          const imageUrl = await generateMeme(imagePrompt)
+          
+          const availableImages = await getAvailableImages();
+          const prompt = `You are tasked with creating an uplifting meme based on a user's personal story. Your goal is to analyze the story, identify any negative thought patterns, and create a meme that gently challenges these beliefs while offering a positive perspective.
+
+Here is the user's story:
+<user_story>
+${userStory}
+</user_story>
+
+Here is the list of available images for the meme background:
+<available_images>
+${availableImages}
+</available_images>
+
+Follow these steps to complete the task:
+
+1. Psychological Analysis:
+   - Carefully read the user's story.
+   - Identify any beliefs, thought patterns, or perspectives that may be negatively impacting the user's mental well-being.
+   - Summarize your insights in 1-2 sentences.
+
+2. Rationale:
+   - Explain in 2-3 sentences how your meme will aim to empathetically reframe the user's perspective in an uplifting way.
+   - Connect your explanation to the specific elements of the user's story and your psychological analysis.
+
+3. Meme Text Creation:
+   - Create a top text and bottom text for the meme.
+   - The text should gently challenge the identified unhelpful beliefs and offer a positive, empowering perspective.
+   - Aim to validate the user's feelings while reframing things in a constructive, hopeful way.
+   - Keep the text concise and impactful. Make sure to keep it simple, suitable for a meme format.
+   - Keep the text easy to understand. Strive to ensure readability at 7-th to 8-th grade level.
+   - Add a single relatable positive emoji to bottom text
+   - Always use user's language when writing meme text.
+
+4. Image Selection:
+   - Review the list of available images.
+   - Choose the most relevant image that complements the message you want to convey.
+   - The image should resonate with the user's story and the positive reframing you intend to provide.
+
+5. Chat Reply Creation:
+   - Generate a reply for the user's story in 3-4 sentences.
+   - Avoid replicating the meme content, try to intricately complement it.
+   - Work on keeping the tone of the message: optimistic and encouraging, informative and educational, casual and relatable, realistic and authentic.
+   - Keep the text easy to understand. Strive to ensure readability at 7-th to 8-th grade level.
+   - Focus on delivering easy and important actionable advice, focused on low-energy behavioral activation and battling negativity bias.
+   - Always use user's language when writing chat reply.
+
+Provide your output in the following format:
+
+<psychological_analysis>
+[Insert your 1-2 sentence summary here]
+</psychological_analysis>
+
+<rationale>
+[Insert your 2-3 sentence explanation here]
+</rationale>
+
+<top_text>
+[Insert the top text of the meme here]
+</top_text>
+
+<bottom_text>
+[Insert the bottom text of the meme here]
+</bottom_text>
+
+<selected_image>
+[Insert the name of the chosen image here]
+</selected_image>
+
+<chat_reply>
+[Insert your 3-4 sentence reply here]
+</chat_reply>
+
+Remember to be compassionate, empathetic, and constructive in your analysis and meme creation. Your goal is to uplift and encourage the user while gently challenging any unhelpful thought patterns.`;
+
+          const response = await anthropic('claude-3-haiku-20240307').complete({
+            prompt,
+            max_tokens_to_sample: 1000,
+          });
+
+          const result = response.completion;
+
+          const topText = result.match(/<top_text>([\s\S]*?)<\/top_text>/)?.[1].trim() || '';
+          const bottomText = result.match(/<bottom_text>([\s\S]*?)<\/bottom_text>/)?.[1].trim() || '';
+          const selectedImage = result.match(/<selected_image>([\s\S]*?)<\/selected_image>/)?.[1].trim() || '';
+          const chatReply = result.match(/<chat_reply>([\s\S]*?)<\/chat_reply>/)?.[1].trim() || '';
+
+          const imageUrl = `/images/memes/${selectedImage}`;
+
           return (
             <BotMessage
-              content={`Here's your meme:`}
+              content={chatReply}
               memeData={{
                 topText,
                 bottomText,
