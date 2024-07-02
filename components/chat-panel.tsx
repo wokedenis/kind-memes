@@ -36,24 +36,24 @@ export function ChatPanel({
 
   const exampleMessages = [
     {
-      heading: 'I\'m feeling anxious',
-      subheading: 'Can you help me understand why?',
-      message: 'I\'ve been feeling very anxious lately. Can you help me understand why and what I can do about it?'
+      heading: 'Share your story',
+      subheading: 'I\'m here to listen',
+      message: 'I\'d like to share my story with you. Can you listen and provide some insights?'
     },
     {
-      heading: 'I had a difficult childhood',
-      subheading: 'How might it affect me now?',
-      message: 'I had a difficult childhood. How might those experiences be affecting me in my adult life?'
+      heading: 'Prepare to open up',
+      subheading: 'How can I start?',
+      message: 'I want to open up about my experiences, but I\'m not sure where to begin. Can you guide me through the process?'
     },
     {
-      heading: 'I\'m having relationship issues',
-      subheading: 'Can you offer some advice?',
-      message: 'I\'m having some issues in my relationship. Can you offer some advice on how to communicate better?'
+      heading: 'Reflect on your journey',
+      subheading: 'Help me make sense of it',
+      message: 'I\'ve been through a lot and I\'d like to reflect on my journey. Can you help me make sense of my experiences?'
     },
     {
-      heading: 'I\'m feeling overwhelmed',
-      subheading: 'How can I manage stress better?',
-      message: 'I\'m feeling overwhelmed with work and life. How can I manage my stress better and find balance?'
+      heading: 'Express yourself freely',
+      subheading: 'Create a safe space',
+      message: 'I need a safe space to express myself. Can you create an environment where I feel comfortable sharing my thoughts and feelings?'
     }
   ]
 
