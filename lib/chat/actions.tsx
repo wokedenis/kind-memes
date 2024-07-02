@@ -181,12 +181,6 @@ export const getUIStateFromAIState = (aiState: Chat) => {
     }))
 }
 async function generateMeme(prompt: string) {
-  try {
-    const response = await fetch(`https://api.unsplash.com/photos/random?query=${encodeURIComponent(prompt)}&client_id=${UNSPLASH_API_KEY}`)
-    const data = await response.json()
-    return data.urls.regular
-  } catch (error) {
-    console.error('Error fetching image:', error)
-    return null
-  }
+  // Using a placeholder image instead of Unsplash API
+  return 'https://i.pinimg.com/originals/b2/2c/36/b22c366f0e8410df0a693ff9d26f1e3e.jpg'
 }
