@@ -15,7 +15,12 @@ export function MemeCanvas({ topText, bottomText, imageUrl }: MemeCanvasProps) {
 
   useEffect(() => {
     const img = new Image()
+    img.crossOrigin = 'anonymous'
     img.onload = () => setMemeImage(img)
+    img.onerror = (e) => {
+      console.error('Error loading image:', e)
+      alert('Failed to load the image. Please try a different URL.')
+    }
     img.src = imageUrl
   }, [imageUrl])
 
@@ -45,17 +50,40 @@ export function MemeCanvas({ topText, bottomText, imageUrl }: MemeCanvasProps) {
 
   const handleCopyMeme = () => {
     if (canvasRef.current) {
-      canvasRef.current.toBlob((blob) => {
-        if (blob) {
-          navigator.clipboard.write([
-            new ClipboardItem({ 'image/png': blob })
-          ]).then(() => {
-            alert('Meme copied to clipboard!')
-          }).catch((error) => {
-            console.error('Error copying meme:', error)
-          })
-        }
-      })
+      try {
+        canvasRef.current.toBlob((blob) => {
+          if (blob) {
+            navigator.clipboard.write([
+              new ClipboardItem({ 'image/png': blob })
+            ]).then(() => {
+              alert('Meme copied to clipboard!')
+            }).catch((error) => {
+              console.error('Error copying meme:', error)
+              fallbackCopyMeme()
+            })
+          }
+        })
+      } catch (error) {
+        console.error('Error creating blob:', error)
+        fallbackCopyMeme()
+      }
+    }
+  }
+
+  const fallbackCopyMeme = () => {
+    if (canvasRef.current) {
+      try {
+        const dataUrl = canvasRef.current.toDataURL('image/png')
+        navigator.clipboard.writeText(dataUrl).then(() => {
+          alert('Meme copied as data URL. You can paste it in an image editor.')
+        }).catch((error) => {
+          console.error('Error copying data URL:', error)
+          alert('Failed to copy meme. Please try saving it instead.')
+        })
+      } catch (error) {
+        console.error('Error creating data URL:', error)
+        alert('Failed to copy meme. Please try saving it instead.')
+      }
     }
   }
 
